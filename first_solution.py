@@ -304,6 +304,118 @@ class ArbolSedes(ArbolRojiNegro):
             self.recorrido_inorden(nodo.der, resultado)
 
 # ========================================================================================
+# FUNCIONES PARA ESTADÍSTICAS
+# ========================================================================================
+def encontrar_equipo_mayor_menor_rendimiento(sedes_ordenadas):
+    """
+    Encuentra los equipos con mayor y menor rendimiento de todas las sedes.
+    Retorna el par ordenado (equipo, sede) para mayor y menor rendimiento.
+    """
+    if not sedes_ordenadas:
+        return None, None
+    
+    equipo_mayor = None
+    sede_mayor = None
+    rendimiento_mayor = -1
+    
+    equipo_menor = None
+    sede_menor = None
+    rendimiento_menor = float('inf')
+    
+    # Recorrer todas las sedes y sus equipos
+    for sede in sedes_ordenadas:
+        equipos_ordenados = []
+        sede.arbol_equipos.recorrido_inorden(sede.arbol_equipos.raiz, equipos_ordenados)
+        
+        for equipo in equipos_ordenados:
+            # Actualizar mayor rendimiento
+            if equipo.promedio_rendimiento > rendimiento_mayor:
+                rendimiento_mayor = equipo.promedio_rendimiento
+                equipo_mayor = equipo
+                sede_mayor = sede
+            
+            # Actualizar menor rendimiento
+            if equipo.promedio_rendimiento < rendimiento_menor:
+                rendimiento_menor = equipo.promedio_rendimiento
+                equipo_menor = equipo
+                sede_menor = sede
+    
+    return (equipo_mayor, sede_mayor), (equipo_menor, sede_menor)
+
+def encontrar_jugador_mayor_menor_rendimiento(jugadores_ordenados):
+    """
+    Encuentra los jugadores con mayor y menor rendimiento.
+    Los jugadores ya están ordenados ascendentemente por rendimiento.
+    """
+    if not jugadores_ordenados:
+        return None, None
+    
+    #quien tenga el menor rendimiento estará de primero
+    jugador_menor = jugadores_ordenados[0]
+    #quien tenga el mayor rendimiento estará al final
+    jugador_mayor = jugadores_ordenados[-1]
+    
+    return jugador_mayor, jugador_menor
+
+def encontrar_jugador_mas_joven_veterano(jugadores_data):
+    """
+    Encuentra el jugador más joven (menor edad) y más veterano (mayor edad).
+    """
+    if not jugadores_data:
+        return None, None
+    
+    mas_joven = min(jugadores_data, key=lambda j: (j['edad'], j['id']))
+    mas_veterano = max(jugadores_data, key=lambda j: (j['edad'], -j['id']))
+    
+    return mas_joven, mas_veterano
+
+def calcular_promedio_edad_rendimiento(jugadores_data):
+    """
+    Calcula el promedio de edad y rendimiento de todos los jugadores.
+    """
+    if not jugadores_data:
+        return 0, 0
+    
+    suma_edades = sum(j['edad'] for j in jugadores_data)
+    suma_rendimientos = sum(j['rendimiento'] for j in jugadores_data)
+    total = len(jugadores_data)
+    
+    promedio_edad = suma_edades / total
+    promedio_rendimiento = suma_rendimientos / total
+    
+    return promedio_edad, promedio_rendimiento
+
+def imprimir_estadisticas (jugadores_data, sedes_ordenadas, ranking_jugadores):
+    """
+    Imprime todas las estadísticas que nos solicita el enunciado
+    """
+    # Equipo con mayor y menor rendimiento
+    (eq_mayor, sede_mayor), (eq_menor, sede_menor) = encontrar_equipo_mayor_menor_rendimiento(sedes_ordenadas)
+    if eq_mayor:
+        print(f"\nEquipo con mayor rendimiento: {eq_mayor.nombre} {sede_mayor.nombre}")
+    if eq_menor:
+        print(f"\nEquipo con menor rendimiento: {eq_menor.nombre} {sede_menor.nombre}")
+ 
+    # Jugador con mayor y menor rendimiento
+    jug_mayor, jug_menor = encontrar_jugador_mayor_menor_rendimiento(ranking_jugadores)
+    if jug_mayor:
+        print(f"\nJugador con mayor rendimiento: {{ {jug_mayor.id} , {jug_mayor.nombre} , {jug_mayor.dato2} }}")
+    if jug_menor:
+        print(f"\nJugador con menor rendimiento: {{ {jug_menor.id} , {jug_menor.nombre} , {jug_menor.dato2} }}")
+
+    # Jugador más joven y más veterano
+    mas_joven, mas_veterano = encontrar_jugador_mas_joven_veterano(jugadores_data)
+    if mas_joven:
+        print(f"\njugador mas joven: {{ {mas_joven['id']} , {mas_joven['nombre']} , {mas_joven['edad']} }}")
+    if mas_veterano:
+        print(f"\njugador mas veterano: {{ {mas_veterano['id']} , {mas_veterano['nombre']} , {mas_veterano['edad']} }}")
+    
+    # Promedios
+    prom_edad, prom_rend = calcular_promedio_edad_rendimiento(jugadores_data)
+    print(f"\nPromedio de edad de los jugadores: {prom_edad:.2f}")
+    print(f"\nPromedio de rendimiento de los jugadores: {prom_rend:.2f}")
+
+# ========================================================================================
 # FUNCIONES AUXILIARES
 # ========================================================================================
 
@@ -410,5 +522,8 @@ def ejecutar_prueba_desde_input(path):
             jugador_ids = [j.id for j in equipo.jugadores]
             print("{" + ", ".join(map(str, jugador_ids)) + "}")
 
-    ranking_jugadores = [node.id for node in construir_arbol_jugadores(jugadores_data)]
-    print("\n{" + ", ".join(map(str, ranking_jugadores)) + "}")
+    ranking_jugadores = construir_arbol_jugadores(jugadores_data)
+    ranking_ids = [node.id for node in ranking_jugadores]
+    print("{" + ", ".join(map(str, ranking_ids)) + "}")
+
+    imprimir_estadisticas(jugadores_data, sedes_ordenadas, ranking_jugadores)
