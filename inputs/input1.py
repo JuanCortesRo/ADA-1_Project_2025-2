@@ -21,4 +21,10 @@ j20 = Jugador("Sara Hernandez", 22, 56)
 
 e1 = Equipo("Futbol", [j10, j2])
 e2 = Equipo("Volleyball", [j1, j9, j12, j6])
+e3 = Equipo("Futbol", [j11, j8, j7])
+e4 = Equipo("Volleyball", [j3, j4, j5])
 e5 = Equipo("Basketball", [j13, j14, j15, j16])
+e6 = Equipo("Basketball", [j17, j18, j19, j20])
+
+s1 = Sede("Sede Cali", [e1, e2, e5])
+s2 = Sede("Sede Medellin", [e3, e4, e6])

@@ -11,6 +11,6 @@ Diciembre 2025
 """
 from first_solution import ejecutar_prueba_desde_input
 
-print("PROYECTO: ASOCIACIÓN DE DEPORTES \nJuan José Cortés Rodríguez - 2325109\n")
+print("PROYECTO: ASOCIACIÓN DE DEPORTES \nJuan José Cortés Rodríguez - 2325109")
 ejecutar_prueba_desde_input("inputs/input1.py")
 #ejecutar_prueba()

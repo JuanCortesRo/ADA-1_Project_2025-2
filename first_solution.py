@@ -115,10 +115,7 @@ class ArbolRojiNegro:
 
 class ArbolJugadores(ArbolRojiNegro):
     """
-    Árbol que ordena jugadores por:
-    1. dato2 (rendimiento) ASCENDENTE
-    2. dato1 (edad) DESCENDENTE
-    3. id ASCENDENTE
+    Árbol que ordena jugadores por su rendimiento de forma ascendente
     """
     def insertar(self, jugador):
         """Inserta un jugador como NodoRB"""
@@ -234,6 +231,77 @@ class ArbolEquipos(ArbolRojiNegro):
             resultado.append(nodo)
             self.recorrido_inorden(nodo.der, resultado)
 
+# ========================================================================================
+# SEDES
+# Se crea una clase NodoSedeRB para sedes, que hereda de NodoRB
+# y se crea un arbol especial para sedes que hereda de ArbolRojiNegro
+# ========================================================================================
+
+class NodoSedeRB(NodoRB):
+    """
+    Nodo especial para sedes que extiende NodoRB.
+    Almacena información de la sede y un árbol de equipos ordenado
+    """
+    def __init__(self, nombre_sede, promedio_rendimiento, total_jugadores, arbol_equipos):
+        super().__init__(
+            id_elemento=None,
+            dato1=promedio_rendimiento,   # Para comparación
+            dato2=total_jugadores,        # Para desempate
+            nombre=nombre_sede
+        )
+        self.promedio_rendimiento = promedio_rendimiento
+        self.total_jugadores = total_jugadores
+        self.arbol_equipos = arbol_equipos  # ArbolEquipos con los equipos de la sede
+
+
+class ArbolSedes(ArbolRojiNegro):
+    """
+    Árbol que ordena sedes por:
+    """
+    def __init__(self):
+        super().__init__()
+        self.NIL = NodoRB(None, 0, 0, None)
+        self.NIL.color = 'B'
+        self.raiz = self.NIL
+
+    def insertar(self, nodo_sede):
+        """Inserta un NodoSedeRB en el árbol"""
+        nodo_sede.izq = self.NIL
+        nodo_sede.der = self.NIL
+        nodo_sede.padre = None
+        
+        y = None
+        x = self.raiz
+
+        while x != self.NIL:
+            y = x
+            # Orden: promedio ASC -> total_jugadores DESC -> nombre ASC
+            if (nodo_sede.dato1 < x.dato1 or
+                (nodo_sede.dato1 == x.dato1 and nodo_sede.dato2 > x.dato2) or
+                (nodo_sede.dato1 == x.dato1 and nodo_sede.dato2 == x.dato2 and nodo_sede.nombre < x.nombre)):
+                x = x.izq
+            else:
+                x = x.der
+
+        nodo_sede.padre = y
+        if y is None:
+            self.raiz = nodo_sede
+        elif (nodo_sede.dato1 < y.dato1 or
+              (nodo_sede.dato1 == y.dato1 and nodo_sede.dato2 > y.dato2) or
+              (nodo_sede.dato1 == y.dato1 and nodo_sede.dato2 == y.dato2 and nodo_sede.nombre < y.nombre)):
+            y.izq = nodo_sede
+        else:
+            y.der = nodo_sede
+
+        nodo_sede.color = 'R'
+        self.insertar_fixup(nodo_sede)
+
+    def recorrido_inorden(self, nodo, resultado):
+        """Recorrido in-orden: devuelve sedes ordenadas"""
+        if nodo != self.NIL:
+            self.recorrido_inorden(nodo.izq, resultado)
+            resultado.append(nodo)
+            self.recorrido_inorden(nodo.der, resultado)
 
 # ========================================================================================
 # FUNCIONES AUXILIARES
@@ -253,7 +321,6 @@ def construir_arbol_jugadores(lista_jugadores):
 def crear_equipo(nombre_deporte, jugadores_dict, ids_jugadores):
     """
     Crea un NodoEquipoRB con jugadores ordenados.
-    Similar a cómo se crean los NodoPreguntaRB en alternativa_uno.py
     """
 
     jugadores_equipo = [jugadores_dict[id] for id in ids_jugadores]
@@ -272,35 +339,76 @@ def crear_equipo(nombre_deporte, jugadores_dict, ids_jugadores):
     
     return nodo_equipo
 
+def crear_sede(nombre_sede, jugadores_dict, equipos_data):
+    """
+    Crea un NodoSedeRB con equipos ordenados.
+    """
+    arbol_equipos = ArbolEquipos()
+    total_jugadores = 0
+    suma_rendimientos = 0
+    
+    for nombre_deporte, ids_jugadores in equipos_data:
+        nodo_equipo = crear_equipo(nombre_deporte, jugadores_dict, ids_jugadores)
+        arbol_equipos.insertar(nodo_equipo)
+        total_jugadores += nodo_equipo.cantidad_jugadores
+        suma_rendimientos += nodo_equipo.promedio_rendimiento
+    
+    # Calcular promedio de la sede
+    rendimiento_sede = suma_rendimientos 
+    
+    nodo_sede = NodoSedeRB(
+        nombre_sede,
+        rendimiento_sede,
+        total_jugadores,
+        arbol_equipos
+    )
+    
+    return nodo_sede
+
 # ============================================
 # FUNCIONES PARA PROBAR
 # ============================================
 
 # Nueva función para ejecutar prueba desde archivo de input, para que se parezca a la salida esperada
 def ejecutar_prueba_desde_input(path):
-    jugadores_data, equipos_objs = cargar_desde_archivo(path)
-    
+    #cargar datos
+    jugadores_data, equipos_objs, sedes_objs = cargar_desde_archivo(path)
+    #crear diccionario de los jugadores para acceder más facil
     jugadores_dict_global = {j["id"]: j for j in jugadores_data}
-
-    arbol_eq = ArbolEquipos()
-    for eq in equipos_objs:
-        ids_globales = []
-        tmp_dict = {}
-        for j in eq.jugadores:
-            id_global = next((jd["id"] for jd in jugadores_data if jd["nombre"] == j.nombre), None)
-            if id_global:
-                ids_globales.append(id_global)
-                tmp_dict[id_global] = jugadores_dict_global[id_global]
+    #crear arbol de sedes
+    arbol_sedes = ArbolSedes()
+    #procesar cada sede
+    for sede_obj in sedes_objs:
+        equipos_data = [] 
         
-        nodo_eq = crear_equipo(eq.deporte, tmp_dict, ids_globales)
-        arbol_eq.insertar(nodo_eq)
+        for equipo_obj in sede_obj.equipos:
+            ids_jugadores = []
+            
+            for jugador_obj in equipo_obj.jugadores:
+                id_global = next((jd["id"] for jd in jugadores_data if jd["nombre"] == jugador_obj.nombre), None)
+                
+                if id_global:
+                    ids_jugadores.append(id_global)
+                    
+            equipos_data.append((equipo_obj.deporte, ids_jugadores))
 
-    equipos_ordenados = []
-    arbol_eq.recorrido_inorden(arbol_eq.raiz, equipos_ordenados)
-    for equipo in equipos_ordenados:
-        print(f"\n{equipo.nombre}, Rendimiento: {equipo.promedio_rendimiento}")
-        jugador_ids = [j.id for j in equipo.jugadores]
-        print("{" + ", ".join(map(str, jugador_ids)) + "}")
+        nodo_sede = crear_sede(sede_obj.nombre, jugadores_dict_global, equipos_data)
+        arbol_sedes.insertar(nodo_sede)
+
+    sedes_ordenadas = []
+    arbol_sedes.recorrido_inorden(arbol_sedes.raiz, sedes_ordenadas)
+    
+    for sede in sedes_ordenadas:
+
+        print(f"\n{sede.nombre}, Rendimiento: {sede.promedio_rendimiento}")
+        
+        equipos_ordenados = []
+        sede.arbol_equipos.recorrido_inorden(sede.arbol_equipos.raiz, equipos_ordenados)
+        
+        for equipo in equipos_ordenados:
+            print(f"\n{equipo.nombre}, Rendimiento: {equipo.promedio_rendimiento}")
+            jugador_ids = [j.id for j in equipo.jugadores]
+            print("{" + ", ".join(map(str, jugador_ids)) + "}")
 
     ranking_jugadores = [node.id for node in construir_arbol_jugadores(jugadores_data)]
     print("\n{" + ", ".join(map(str, ranking_jugadores)) + "}")
