@@ -357,7 +357,7 @@ def encontrar_jugador_mayor_menor_rendimiento(jugadores_ordenados):
     
     return jugador_mayor, jugador_menor
 
-def imprimir_estadisticas (sedes_ordenadas):
+def imprimir_estadisticas (sedes_ordenadas, ranking_jugadores):
     """
     Imprime todas las estadísticas que nos solicita el enunciado
     """
@@ -368,6 +368,13 @@ def imprimir_estadisticas (sedes_ordenadas):
     if eq_menor:
         print(f"\nEquipo con menor rendimiento: {eq_menor.nombre} {sede_menor.nombre}")
  
+    # Jugador con mayor y menor rendimiento
+    jug_mayor, jug_menor = encontrar_jugador_mayor_menor_rendimiento(ranking_jugadores)
+    if jug_mayor:
+        print(f"\nJugador con mayor rendimiento: {{ {jug_mayor.id} , {jug_mayor.nombre} , {jug_mayor.dato2} }}")
+    if jug_menor:
+        print(f"\nJugador con menor rendimiento: {{ {jug_menor.id} , {jug_menor.nombre} , {jug_menor.dato2} }}")
+    
 # ========================================================================================
 # FUNCIONES AUXILIARES
 # ========================================================================================
@@ -475,7 +482,8 @@ def ejecutar_prueba_desde_input(path):
             jugador_ids = [j.id for j in equipo.jugadores]
             print("{" + ", ".join(map(str, jugador_ids)) + "}")
 
-    ranking_jugadores = [node.id for node in construir_arbol_jugadores(jugadores_data)]
-    print("\n{" + ", ".join(map(str, ranking_jugadores)) + "}")
+    ranking_jugadores = construir_arbol_jugadores(jugadores_data)
+    ranking_ids = [node.id for node in ranking_jugadores]
+    print("{" + ", ".join(map(str, ranking_ids)) + "}")
 
-    imprimir_estadisticas(sedes_ordenadas)
+    imprimir_estadisticas(sedes_ordenadas, ranking_jugadores)
