@@ -11,6 +11,5 @@ Diciembre 2025
 """
 from first_solution import ejecutar_prueba
 
-print("PROYECTO: ASOCIACIÓN DE DEPORTES")
-
+print("PROYECTO: ASOCIACIÓN DE DEPORTES \nJuan José Cortés Rodríguez - 2325109\n")
 ejecutar_prueba()
