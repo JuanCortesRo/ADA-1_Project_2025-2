@@ -36,8 +36,8 @@ def procesar_archivo(path_input, path_output=None):
     Si no, imprime en consola.
     
     Args:
-        path_input: Ruta al archivo de input (.py)
-        path_output: Ruta al archivo de salida (.txt) o None para consola
+        path_input (str): Ruta al archivo de input (.py)
+        path_output (str): Ruta al archivo de salida (.txt) o None para consola
     """
     # Cargar datos
     jugadores_data, equipos_objs, sedes_objs = cargar_desde_archivo(path_input)
@@ -147,8 +147,8 @@ def procesar_todos_los_inputs(carpeta_inputs="inputs", carpeta_outputs="outputs"
     los archivos de salida correspondientes en la carpeta outputs.
     
     Args:
-        carpeta_inputs: Carpeta donde están los archivos input.py
-        carpeta_outputs: Carpeta donde se guardarán los archivos output.txt
+        carpeta_inputs (str): Carpeta donde están los archivos input.py
+        carpeta_outputs (str): Carpeta donde se guardarán los archivos output.txt
     """
 
     archivos_input = []

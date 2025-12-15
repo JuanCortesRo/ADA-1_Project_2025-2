@@ -110,8 +110,8 @@ def procesar_todos_los_inputs(carpeta_inputs="inputs", carpeta_outputs="outputs"
     los archivos de salida correspondientes en la carpeta outputs.
     
     Args:
-        carpeta_inputs: Carpeta donde están los archivos input.py
-        carpeta_outputs: Carpeta donde se guardarán los archivos output.txt
+        carpeta_inputs (str): Carpeta donde están los archivos input.py
+        carpeta_outputs (str): Carpeta donde se guardarán los archivos output.txt
     """
 
     archivos_input = []

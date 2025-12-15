@@ -14,6 +14,22 @@ Diciembre 2025
 from classes import Jugador, Equipo, Sede
 
 def cargar_desde_archivo(path):
+    """
+    Carga datos de jugadores, equipos y sedes desde un archivo Python.
+    
+    Args:
+        path (str): Ruta al archivo .py que contiene los datos del input
+        
+    Returns:
+        tuple: (jugadores_data, equipos_objs, sedes_objs)
+            - jugadores_data (list): Lista de diccionarios con datos de jugadores
+            - equipos_objs (list): Lista de objetos Equipo
+            - sedes_objs (list): Lista de objetos Sede
+            
+    Raises:
+        FileNotFoundError: Si el archivo no existe
+        Exception: Si hay errores en el formato del archivo
+    """
     ns = {"Jugador": Jugador, "Equipo": Equipo, "Sede": Sede}
     
     with open(path, "r", encoding="utf-8") as f:

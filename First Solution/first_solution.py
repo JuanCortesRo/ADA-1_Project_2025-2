@@ -17,8 +17,29 @@ Diciembre 2025
 # ========================================================================================
 
 class NodoRB:
-    """Nodo del árbol rojinegro para los jugadores"""
+    """
+    Nodo del árbol rojinegro para almacenar jugadores.
+    
+    Attributes:
+        id (int): Identificador único del jugador
+        dato1 (int): Edad del jugador
+        dato2 (int): Rendimiento del jugador
+        nombre (str): Nombre completo del jugador
+        color (str): Color del nodo ('R' para rojo, 'B' para negro)
+        izq (NodoRB): Referencia al hijo izquierdo
+        der (NodoRB): Referencia al hijo derecho
+        padre (NodoRB): Referencia al nodo padre
+    """
     def __init__(self, id_elemento, dato1, dato2, nombre):
+        """
+        Inicializa un nuevo nodo del árbol rojinegro.
+        
+        Args:
+            id_elemento (int): ID único del jugador
+            dato1 (int): Edad del jugador
+            dato2 (int): Rendimiento del jugador
+            nombre (str): Nombre del jugador
+        """
         self.id = id_elemento
         self.dato1 = dato1
         self.dato2 = dato2
@@ -29,18 +50,39 @@ class NodoRB:
         self.padre = None
     
     def __str__(self):
+        """
+        Representación en cadena del nodo.
+        
+        Returns:
+            str: Información formateada del jugador
+        """
         return f"Jugador(ID: {self.id}, Nombre: {self.nombre}, Edad: {self.dato1}, Rendimiento: {self.dato2}, Color: {self.color})"
 
 
 class ArbolRojiNegro:
-    """Árbol Rojinegro base con operaciones de inserción y balanceo"""
+    """
+    Implementación de árbol rojinegro con operaciones de inserción y balanceo.
+    
+    Attributes:
+        NIL (NodoRB): Nodo centinela que representa hojas vacías
+        raiz (NodoRB): Nodo raíz del árbol
+    """
     def __init__(self):
+        """Inicializa un árbol rojinegro vacío."""
         self.NIL = NodoRB(None, None, None, None)
         self.NIL.color = 'B'
         self.raiz = self.NIL
 
     def rotar_izquierda(self, x):
-        """Rotación izquierda para balance del árbol"""
+        """
+        Realiza rotación izquierda en el árbol rojinegro.
+        
+        Args:
+            x (NodoRB): Nodo sobre el cual realizar la rotación
+            
+        Note:
+            Operación fundamental para mantener el balanceo del árbol.
+        """
         y = x.der
         x.der = y.izq
         if y.izq != self.NIL:
@@ -56,7 +98,15 @@ class ArbolRojiNegro:
         x.padre = y
 
     def rotar_derecha(self, x):
-        """Rotación derecha para balance del árbol"""
+        """
+        Realiza rotación derecha en el árbol rojinegro.
+        
+        Args:
+            x (NodoRB): Nodo sobre el cual realizar la rotación
+            
+        Note:
+            Operación fundamental para mantener el balanceo del árbol.
+        """
         y = x.izq
         x.izq = y.der
         if y.der != self.NIL:
@@ -72,7 +122,12 @@ class ArbolRojiNegro:
         x.padre = y
 
     def insertar_fixup(self, z):
-        """Corrige propiedades del árbol después de insertar"""
+        """
+        Restaura las propiedades del árbol rojinegro después de una inserción.
+        
+        Args:
+            z (NodoRB): Nodo recién insertado que puede violar las propiedades
+        """
         while z.padre and z.padre.color == 'R':
             if z.padre == z.padre.padre.izq:
                 y = z.padre.padre.der
@@ -113,14 +168,19 @@ class ArbolRojiNegro:
 
 class ArbolJugadores(ArbolRojiNegro):
     """
-    Árbol que ordena jugadores por su rendimiento de forma ascendente
+    Árbol que ordena jugadores por su rendimiento de forma ascendente, extiende de ArbolRojiNegro
     """
     def insertar(self, jugador):
-        """Inserta un jugador como NodoRB"""
+        """
+        Inserta un jugador en el árbol rojinegro.
+
+        Args:
+            jugador (dict): Diccionario con datos del jugador
+        """
         nodo = NodoRB(
             jugador['id'],
-            jugador['edad'],      # dato1 = edad
-            jugador['rendimiento'], # dato2 = rendimiento
+            jugador['edad'],      
+            jugador['rendimiento'], 
             jugador['nombre']
         )
         nodo.izq = self.NIL
@@ -154,7 +214,17 @@ class ArbolJugadores(ArbolRojiNegro):
         self.insertar_fixup(nodo)
 
     def recorrido_inorden(self, nodo, resultado):
-        """Recorrido in-orden: devuelve jugadores ordenados"""
+        """
+        Recorre el árbol en orden y almacena los nodos en una lista.
+        
+        Args:
+            nodo (NodoRB): Nodo actual del recorrido
+            resultado (list): Lista donde se almacenan los nodos ordenados
+            
+        Note:
+            El recorrido in-orden garantiza que los elementos se visiten
+            en orden ascendente según los criterios de comparación.
+        """
         if nodo != self.NIL:
             self.recorrido_inorden(nodo.izq, resultado)
             resultado.append(nodo)
@@ -168,9 +238,18 @@ class ArbolJugadores(ArbolRojiNegro):
 
 class NodoEquipoRB(NodoRB):
     """
-    Nodo especial para equipos que extiende NodoRB.
+    Nodo especializado para almacenar información de equipos, extiende de NodoRB
     """
     def __init__(self, nombre_deporte, promedio_rendimiento, cantidad_jugadores, jugadores_ordenados):
+        """
+        Inicializa un nodo de equipo.
+        
+        Args:
+            nombre (str): Nombre del deporte
+            promedio_rendimiento (float): Promedio de rendimiento calculado
+            cantidad_jugadores (int): Número de jugadores
+            jugadores (list): Lista de nodos NodoRB de jugadores ordenados
+        """
         super().__init__(
             id_elemento=None,
             dato1=promedio_rendimiento, 
@@ -183,7 +262,7 @@ class NodoEquipoRB(NodoRB):
 
 class ArbolEquipos(ArbolRojiNegro):
     """
-    Árbol que ordena equipos en orden 
+    Árbol rojinegro especializado para ordenar equipos, extiende de ArbolRojiNegro
     """
     def __init__(self):
         super().__init__()
@@ -192,6 +271,12 @@ class ArbolEquipos(ArbolRojiNegro):
         self.raiz = self.NIL
 
     def insertar(self, nodo_equipo):
+        """
+        Inserta un nodo de equipo en el árbol rojinegro.
+
+        Args:
+            nodo_equipo (NodoEquipoRB): Nodo de equipo a insertar
+        """
         nodo_equipo.izq = self.NIL
         nodo_equipo.der = self.NIL
         nodo_equipo.padre = None
@@ -238,9 +323,17 @@ class ArbolEquipos(ArbolRojiNegro):
 class NodoSedeRB(NodoRB):
     """
     Nodo especial para sedes que extiende NodoRB.
-    Almacena información de la sede y un árbol de equipos ordenado
     """
     def __init__(self, nombre_sede, promedio_rendimiento, total_jugadores, arbol_equipos):
+        """
+        Inicializa un nodo de sede.
+        
+        Args:
+            nombre (str): Nombre de la sede
+            promedio_rendimiento (float): Promedio calculado de todos los equipos
+            total_jugadores (int): Suma de jugadores de todos los equipos
+            arbol_equipos (ArbolEquipos): Árbol con equipos ordenados
+        """
         super().__init__(
             id_elemento=None,
             dato1=promedio_rendimiento,   # Para comparación
@@ -254,16 +347,24 @@ class NodoSedeRB(NodoRB):
 
 class ArbolSedes(ArbolRojiNegro):
     """
-    Árbol que ordena sedes por:
+    Árbol rojinegro especializado para ordenar sedes, extiende de ArbolRojiNegro.
     """
     def __init__(self):
+        """
+        Inicializa un árbol rojinegro vacío para sedes.
+        """
         super().__init__()
         self.NIL = NodoRB(None, 0, 0, None)
         self.NIL.color = 'B'
         self.raiz = self.NIL
 
     def insertar(self, nodo_sede):
-        """Inserta un NodoSedeRB en el árbol"""
+        """
+        Inserta una sede en el árbol rojinegro.
+        
+        Args:
+            nodo_sede (NodoSedeRB): Nodo de sede a insertar
+        """
         nodo_sede.izq = self.NIL
         nodo_sede.der = self.NIL
         nodo_sede.padre = None
@@ -273,7 +374,7 @@ class ArbolSedes(ArbolRojiNegro):
 
         while x != self.NIL:
             y = x
-            # Orden: promedio ASC -> total_jugadores DESC -> nombre ASC
+
             if (nodo_sede.dato1 < x.dato1 or
                 (nodo_sede.dato1 == x.dato1 and nodo_sede.dato2 > x.dato2) or
                 (nodo_sede.dato1 == x.dato1 and nodo_sede.dato2 == x.dato2 and nodo_sede.nombre < x.nombre)):
@@ -295,7 +396,13 @@ class ArbolSedes(ArbolRojiNegro):
         self.insertar_fixup(nodo_sede)
 
     def recorrido_inorden(self, nodo, resultado):
-        """Recorrido in-orden: devuelve sedes ordenadas"""
+        """
+        Recorre el árbol de sedes en orden y almacena los nodos en una lista.
+        
+        Args:
+            nodo (NodoSedeRB): Nodo actual del recorrido
+            resultado (list): Lista donde se almacenan las sedes ordenadas
+        """
         if nodo != self.NIL:
             self.recorrido_inorden(nodo.izq, resultado)
             resultado.append(nodo)
@@ -307,7 +414,13 @@ class ArbolSedes(ArbolRojiNegro):
 def encontrar_equipo_mayor_menor_rendimiento(sedes_ordenadas):
     """
     Encuentra los equipos con mayor y menor rendimiento de todas las sedes.
-    Retorna el par ordenado (equipo, sede) para mayor y menor rendimiento.
+    
+    Args:
+        sedes_ordenadas (list): Lista de NodoSedeRB ordenadas
+        
+    Returns:
+        tuple: ((equipo_mayor, sede_mayor), (equipo_menor, sede_menor))
+            Donde cada elemento es una tupla (NodoEquipoRB, NodoSedeRB)
     """
     if not sedes_ordenadas:
         return None, None
@@ -343,7 +456,16 @@ def encontrar_equipo_mayor_menor_rendimiento(sedes_ordenadas):
 def encontrar_jugador_mayor_menor_rendimiento(jugadores_ordenados):
     """
     Encuentra los jugadores con mayor y menor rendimiento.
-    Los jugadores ya están ordenados ascendentemente por rendimiento.
+    
+    Args:
+        jugadores_ordenados (list): Lista de NodoRB ordenados por rendimiento
+        
+    Returns:
+        tuple: (jugador_mayor, jugador_menor)
+            Donde cada elemento es un NodoRB
+            
+    Note:
+        Como ya está ordenada ascendentemente, toma el primero y último.
     """
     if not jugadores_ordenados:
         return None, None
@@ -357,7 +479,14 @@ def encontrar_jugador_mayor_menor_rendimiento(jugadores_ordenados):
 
 def encontrar_jugador_mas_joven_veterano(jugadores_data):
     """
-    Encuentra el jugador más joven (menor edad) y más veterano (mayor edad).
+    Encuentra el jugador más joven y más veterano.
+    
+    Args:
+        jugadores_data (list): Lista de diccionarios con datos de jugadores
+        
+    Returns:
+        tuple: (mas_joven, mas_veterano)
+            Donde cada elemento es un diccionario de jugador
     """
     if not jugadores_data:
         return None, None
@@ -370,6 +499,16 @@ def encontrar_jugador_mas_joven_veterano(jugadores_data):
 def calcular_promedio_edad_rendimiento(jugadores_data):
     """
     Calcula el promedio de edad y rendimiento de todos los jugadores.
+    
+    Args:
+        jugadores_data (list): Lista de diccionarios con datos de jugadores
+        
+    Returns:
+        tuple: (promedio_edad, promedio_rendimiento)
+            Donde cada elemento es un float
+            
+    Note:
+        Retorna (0, 0) si no hay jugadores en la lista.
     """
     if not jugadores_data:
         return 0, 0
@@ -385,7 +524,12 @@ def calcular_promedio_edad_rendimiento(jugadores_data):
 
 def imprimir_estadisticas (jugadores_data, sedes_ordenadas, ranking_jugadores):
     """
-    Imprime todas las estadísticas que nos solicita el enunciado
+    Imprime todas las estadísticas solicitadas en el enunciado.
+    
+    Args:
+        jugadores_data (list): Lista de diccionarios con datos de jugadores
+        sedes_ordenadas (list): Lista de NodoSedeRB ordenadas
+        ranking_jugadores (list): Lista de NodoRB ordenados por ranking
     """
     # Equipo con mayor y menor rendimiento
     (eq_mayor, sede_mayor), (eq_menor, sede_menor) = encontrar_equipo_mayor_menor_rendimiento(sedes_ordenadas)
@@ -418,7 +562,15 @@ def imprimir_estadisticas (jugadores_data, sedes_ordenadas, ranking_jugadores):
 # ========================================================================================
 
 def construir_arbol_jugadores(lista_jugadores):
-    """Construye árbol de jugadores y devuelve nodos ordenados"""
+    """
+    Construye un árbol rojinegro de jugadores y devuelve los nodos ordenados.
+    
+    Args:
+        lista_jugadores (list): Lista de diccionarios con datos de jugadores
+        
+    Returns:
+        list: Lista de NodoRB ordenados según criterios de jugadores
+    """
     arbol = ArbolJugadores()
     for j in lista_jugadores:
         arbol.insertar(j)
@@ -431,6 +583,14 @@ def construir_arbol_jugadores(lista_jugadores):
 def crear_equipo(nombre_deporte, jugadores_dict, ids_jugadores):
     """
     Crea un NodoEquipoRB con jugadores ordenados.
+    
+    Args:
+        nombre_deporte (str): Nombre del deporte del equipo
+        jugadores_dict (dict): Diccionario para acceso rápido
+        ids_jugadores (list): Lista de IDs de jugadores que conforman el equipo
+        
+    Returns:
+        NodoEquipoRB: Nodo de equipo con jugadores ordenados y estadísticas calculadas
     """
 
     jugadores_equipo = [jugadores_dict[id] for id in ids_jugadores]
@@ -452,6 +612,14 @@ def crear_equipo(nombre_deporte, jugadores_dict, ids_jugadores):
 def crear_sede(nombre_sede, jugadores_dict, equipos_data):
     """
     Crea un NodoSedeRB con equipos ordenados.
+    
+    Args:
+        nombre_sede (str): Nombre de la sede
+        jugadores_dict (dict): Diccionario {id: jugador_dict} para acceso rápido
+        equipos_data (list): Lista de tuplas (nombre_deporte, ids_jugadores)
+        
+    Returns:
+        NodoSedeRB: Nodo de sede con equipos ordenados y estadísticas calculadas
     """
     arbol_equipos = ArbolEquipos()
     total_jugadores = 0
@@ -474,5 +642,3 @@ def crear_sede(nombre_sede, jugadores_dict, equipos_data):
     )
     
     return nodo_sede
-
-# Las funciones de ejecución y pruebas están en processor.py

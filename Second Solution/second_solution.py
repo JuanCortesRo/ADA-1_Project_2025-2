@@ -117,7 +117,7 @@ def insertion_sort_equipos(lista_equipos):
     Ordena equipos usando Insertion Sort.
     
     Args:
-        lista_equipos: Lista de equipos a ordenar (se modifica in-place)
+        lista_equipos: Lista de diccionarios representando equipos (se modifica in-place)
 
     Returns:
         list: Lista de equipos ordenada según los criterios dados
@@ -207,7 +207,7 @@ def insertion_sort_sedes(lista_sedes):
     Ordena sedes usando Insertion Sort
 
     Args:
-        lista_sedes: Lista de sedes a ordenar (se modifica in-place)
+        lista_sedes: LLista de diccionarios representando sedes (se modifica in-place)
 
     Returns:
         list: Lista de sedes ordenada según los criterios dados
@@ -293,9 +293,21 @@ def crear_sede(nombre_sede, jugadores_dict, equipos_data):
         'equipos': equipos_ordenados
     }
 
-# Función de prueba antes de usar las input
-# Esta funcion me sirvió para ir probando la implementación antes de utilizar los inputs...
+
 def prueba():
+    """
+    Función de prueba completa de la segunda solución.
+    
+    Propósito:
+        - Valida el funcionamiento de merge sort para jugadores
+        - Valida el funcionamiento de insertion sort para equipos y sedes
+        - Genera ranking global de jugadores
+        
+    Note:
+        Utiliza datos del enunciado del proyecto para las pruebas.
+        Se ejecuta cuando el archivo se ejecuta directamente (__name__ == "__main__").
+        Al final no tiene tanta relevancia.
+    """
     # Datos de prueba del enunciado
     jugadores_data = [
         {"id": 1, "nombre": "Sofía García", "edad": 21, "rendimiento": 66},
