@@ -84,7 +84,7 @@ Cada archivo contiene:
 
 ---
 
-## 📧 Contacto
+## Contacto
 
 **Juan José Cortés Rodríguez**  
 - Email: [juan.jose.cortes@correounivalle.edu.co]
