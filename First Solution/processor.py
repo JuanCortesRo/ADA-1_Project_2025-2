@@ -12,7 +12,10 @@ Diciembre 2025
 
 import os
 import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from loader import cargar_desde_archivo
+
 from first_solution import (
     construir_arbol_jugadores,
     crear_sede,
@@ -115,8 +118,7 @@ def procesar_todos_los_inputs(carpeta_inputs="inputs", carpeta_outputs="outputs"
                                 if f.startswith("input") and f.endswith(".py")])
     
     if not archivos_input:
-        print(f"⚠️  No se encontraron archivos input*.py en {carpeta_inputs}")
-        return
+        raise FileNotFoundError(f"No se encontraron archivos de input en {carpeta_inputs}")
     
     for archivo in archivos_input:
         numero = archivo.replace("input", "").replace(".py", "")

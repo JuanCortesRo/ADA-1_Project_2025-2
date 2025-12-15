@@ -1,3 +1,5 @@
+from classes import Jugador, Equipo, Sede
+
 j1 = Jugador("Juan", 20, 94)
 j2 = Jugador("Maria", 21, 94)
 j3 = Jugador("Pedro", 22, 21)
