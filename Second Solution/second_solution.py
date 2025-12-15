@@ -109,9 +109,103 @@ def comparar_jugadores(j1, j2):
     
     return 0
 
+# ========================================================================================
+# INSERTION SORT PARA EQUIPOS
+# utilicé el algoritmo insertion sort del curso para ordenar los equipos
+# ========================================================================================
+
+def insertion_sort_equipos(lista_equipos):
+    """
+    Ordena equipos usando Insertion Sort.
+    
+    Args:
+        lista_equipos: Lista de equipos a ordenar (se modifica in-place)
+
+    Returns:
+        Lista de equipos ordenada según los criterios dados
+    """
+    n = len(lista_equipos)
+    
+    if n <= 1:
+        return lista_equipos
+    
+    #insertion sort
+    for j in range(1, n):
+        key = lista_equipos[j]
+        
+        i = j - 1
+        
+        while i >= 0 and comparar_equipos(lista_equipos[i], key) > 0:
+            lista_equipos[i + 1] = lista_equipos[i]
+
+            i = i - 1
+        
+        lista_equipos[i + 1] = key
+    
+    return lista_equipos
+
+
+def comparar_equipos(eq1, eq2):
+    """
+    Compara dos equipos según los criterios de desempate.
+    
+    Args:
+        eq1: Diccionario del equipo 1
+        eq2: Diccionario del equipo 2  
+
+    Returns:    
+        -1 si eq1 debe ir antes que eq2
+        0 si son equivalentes
+        1 si eq2 debe ir antes que eq1
+    """
+    #promedio rendimiento ascendente
+    if eq1['promedio_rendimiento'] < eq2['promedio_rendimiento']:
+        return -1
+    elif eq1['promedio_rendimiento'] > eq2['promedio_rendimiento']:
+        return 1
+    
+    #si hay empate de rendimiento criterio 2: cantidad de jugadores descendiente
+    if eq1['cantidad_jugadores'] > eq2['cantidad_jugadores']:
+        return -1
+    elif eq1['cantidad_jugadores'] < eq2['cantidad_jugadores']:
+        return 1
+    
+    return 0
+
+def crear_equipo(nombre_deporte, jugadores_dict, ids_jugadores):
+    """
+    Crea un equipo con jugadores ordenados gracias al mergesort
+    
+    Args:
+        nombre_deporte: Nombre del deporte 
+        jugadores_dict: Diccionario global de jugadores
+        ids_jugadores: Lista de cuales jugadores hacen parte del equipo (sus IDs)
+    
+    Returns:
+        Diccionario con información del equipo y jugadores ordenados
+    """
+    # Obtener lista de jugadores del equipo
+    jugadores_equipo = [jugadores_dict[id_jug] for id_jug in ids_jugadores]
+    
+    # ✅ Ordenar jugadores usando Merge Sort CLRS (in-place)
+    # merge_sort_jugadores(A, p, r) donde p=0, r=len-1
+    if len(jugadores_equipo) > 0:
+        merge_sort_jugadores(jugadores_equipo, 0, len(jugadores_equipo) - 1)
+    
+    # Calcular promedio de rendimiento
+    suma_rendimientos = sum(j['rendimiento'] for j in jugadores_equipo)
+    promedio = suma_rendimientos / len(jugadores_equipo) if jugadores_equipo else 0
+    
+    # Retornar equipo como diccionario
+    return {
+        'nombre': nombre_deporte,
+        'promedio_rendimiento': promedio,
+        'cantidad_jugadores': len(jugadores_equipo),
+        'jugadores': jugadores_equipo  # Ya está ordenada in-place
+    }
 
 # Función de prueba antes de usar las input
-def prueba_merge_jugadores():
+def prueba():
     # Datos de prueba del enunciado
     jugadores_data = [
         {"id": 1, "nombre": "Sofía García", "edad": 21, "rendimiento": 66},
@@ -128,20 +222,33 @@ def prueba_merge_jugadores():
         {"id": 12, "nombre": "Lucas Vásquez", "edad": 26, "rendimiento": 82}
     ]
 
-    merge_sort_jugadores(jugadores_data, 0, len(jugadores_data) - 1)
-    # print((len(jugadores_data)-1)//2)
-    # print((0 + (len(jugadores_data) - 1))//2)
+    #parte de los equipos
+    jugadores_dict = {j['id']: j for j in jugadores_data}
+
+    equipo_futbol = crear_equipo("Futbol", jugadores_dict, [10, 2])
+    equipo_volleyball = crear_equipo("Volleyball", jugadores_dict, [1, 9, 12, 6])
     
-    #resultado
+    equipos = [equipo_volleyball, equipo_futbol]
+
+    equipos_ordenados = insertion_sort_equipos(equipos)
+
+    for eq in equipos_ordenados:
+        print(f"\n{eq['nombre']}, Rendimiento: {eq['promedio_rendimiento']}")
+        ids = [j['id'] for j in eq['jugadores']]
+        print("{" + ", ".join(map(str, ids)) + "}")
+
+    #parte del ranking
+    merge_sort_jugadores(jugadores_data, 0, len(jugadores_data) - 1)
+
     print("\nJugadores ordenados:")
     for j in jugadores_data:
         print(f"ID: {j['id']}, {j['nombre']}, Edad: {j['edad']}, Rendimiento: {j['rendimiento']}")
     
-    print("\nRanking:")
+    print("\nRanking Jugadores:")
     ranking_ids = [j['id'] for j in jugadores_data]
     print("{" + ", ".join(map(str, ranking_ids)) + "}")
     print()
 
 
 if __name__ == "__main__":
-    prueba_merge_jugadores()
+    prueba()
